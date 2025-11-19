@@ -3,31 +3,43 @@ package lt.esdc.multithreading.lab1.task8;
 /**
  * Shared state between Producer and Consumer threads
  * Uses this object as a single monitor for synchronization
+ * State is checked from ProducerThread
  */
 public class SharedState {
-    private boolean state = false;  // Current state of Producer
+    private ProducerThread producerThread;  // Reference to Producer to check its state
     private int remainingTime = Integer.MAX_VALUE;  // Remaining countdown time (initialized to max to prevent early stop)
     private boolean shouldStop = false;  // Flag to stop both threads
     
     // Single monitor - all synchronized methods use 'this' as monitor
     
-    public void setState(boolean newState) {
+    /**
+     * Set reference to ProducerThread
+     */
+    public void setProducerThread(ProducerThread producerThread) {
         synchronized (this) {
-            this.state = newState;
-            notifyAll();  // Notify all threads waiting on this monitor
+            this.producerThread = producerThread;
         }
     }
     
+    /**
+     * Get state from ProducerThread (synchronized on this monitor)
+     */
     public boolean getState() {
         synchronized (this) {
-            return state;
+            if (producerThread != null) {
+                return producerThread.getProducerState();
+            }
+            return false;
         }
     }
     
+    /**
+     * Wait for Producer state to become true (synchronized on this monitor)
+     */
     public void waitForTrue() throws InterruptedException {
         synchronized (this) {
-            while (!state && !shouldStop) {
-                wait();  // Wait on this monitor until state becomes true
+            while (producerThread != null && !producerThread.getProducerState() && !shouldStop) {
+                wait();  // Wait on this monitor until Producer state becomes true
             }
         }
     }

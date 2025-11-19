@@ -2,10 +2,12 @@ package lt.esdc.multithreading.lab1.task8;
 
 /**
  * Thread P: Switches between true and false with delay M milliseconds
+ * State is managed by this thread
  */
 public class ProducerThread extends Thread {
     private final SharedState sharedState;
     private final int M;  // Delay in milliseconds
+    private boolean state = false;  // State managed by Producer thread
     
     public ProducerThread(SharedState sharedState, int M) {
         super("Producer");
@@ -13,17 +15,34 @@ public class ProducerThread extends Thread {
         this.M = M;
     }
     
+    /**
+     * Get current Producer state (synchronized on SharedState monitor)
+     */
+    public boolean getProducerState() {
+        synchronized (sharedState) {
+            return state;
+        }
+    }
+    
+    /**
+     * Set state and notify waiting threads (synchronized on SharedState monitor)
+     */
+    private void setProducerState(boolean newState) {
+        synchronized (sharedState) {
+            this.state = newState;
+            sharedState.notifyAll();  // Notify all threads waiting on SharedState monitor
+        }
+    }
+    
     @Override
     public void run() {
-        boolean currentState = false;
-        
         while (!sharedState.shouldStop()) {
             try {
-                // Switch state (uses sharedState as monitor)
-                currentState = !currentState;
-                sharedState.setState(currentState);
+                // Switch state
+                state = !state;
+                setProducerState(state);
                 
-                System.out.println("Producer: State changed to " + currentState);
+                System.out.println("Producer: State changed to " + state);
                 
                 // Wait M milliseconds before next switch
                 long startTime = System.currentTimeMillis();

@@ -26,6 +26,9 @@ public class MainThreadTask8 {
         ProducerThread producer = new ProducerThread(sharedState, M);
         ConsumerThread consumer = new ConsumerThread(sharedState, K, M);
         
+        // Register ProducerThread with SharedState so Consumer can check its state
+        sharedState.setProducerThread(producer);
+        
         // Start both threads
         producer.start();
         consumer.start();
