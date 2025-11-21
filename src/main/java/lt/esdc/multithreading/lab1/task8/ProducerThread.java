@@ -43,12 +43,9 @@ public class ProducerThread extends Thread {
                 setProducerState(state);
                 
                 System.out.println("Producer: State changed to " + state);
-                
-                // Wait M milliseconds before next switch
-                long startTime = System.currentTimeMillis();
-                while (System.currentTimeMillis() - startTime < M && !sharedState.shouldStop()) {
-                    Thread.sleep(50);  // Check every 50ms for stop condition
-                }
+
+                Thread.sleep(M);  // Sleep with delay M
+
                 
             } catch (InterruptedException e) {
                 System.out.println("Producer interrupted");

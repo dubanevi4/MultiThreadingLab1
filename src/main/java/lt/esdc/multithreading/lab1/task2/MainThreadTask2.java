@@ -1,7 +1,7 @@
 package lt.esdc.multithreading.lab1.task2;
 
 public class MainThreadTask2 {
-    static int COUNTER = 10;
+    public static final int COUNTER = 10;
 
     public static void main(String[] args){
 

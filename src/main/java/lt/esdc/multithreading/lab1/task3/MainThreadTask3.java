@@ -3,7 +3,7 @@ package lt.esdc.multithreading.lab1.task3;
 import lt.esdc.multithreading.lab1.task1.WalkThreadTask1;
 
 public class MainThreadTask3 {
-    static int COUNTER = 10;
+    public static final int COUNTER = 10;
 
     public static void main(String[] args){
 

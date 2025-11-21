@@ -2,7 +2,7 @@ package lt.esdc.multithreading.lab1.task4;
 
 public class MainThreadTask4 {
 
-    public static int THNUM = 5;
+    public static final int THNUM = 5;
 
     public static void main(String[] args) {
 
