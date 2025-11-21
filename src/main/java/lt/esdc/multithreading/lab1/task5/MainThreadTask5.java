@@ -22,6 +22,7 @@ public class MainThreadTask5 {
     public static void main(String[] args) throws InterruptedException {
         // Create a thread that will sleep
         Thread workerThread = new Thread() {
+            @Override
             public void run() {
                 print(Arrays.asList("First", "Second", "Third", "Fourth"));
             }
