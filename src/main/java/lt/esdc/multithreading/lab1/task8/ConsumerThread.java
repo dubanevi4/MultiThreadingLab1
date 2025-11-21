@@ -17,7 +17,7 @@ public class ConsumerThread extends Thread {
     }
     
     @Override
-    public void run() {
+    public void run(){
         sharedState.setRemainingTime(K);
         int delay = Math.max(1, M / 10);  // Delay between countdown steps
         
@@ -33,7 +33,10 @@ public class ConsumerThread extends Thread {
                 }
                 
                 // Countdown while state is true
-                while (!sharedState.shouldStop() && sharedState.getState()) {
+                while (!sharedState.shouldStop()) {
+                    if (!sharedState.getState()) {
+                        break;
+                    }
                     int remaining = sharedState.getRemainingTime();
                     
                     if (remaining <= 0) {
@@ -44,22 +47,20 @@ public class ConsumerThread extends Thread {
                     
                     System.out.println("Consumer: Countdown = " + remaining + "ms");
                     
-                    // Decrement by delay amount
-                    sharedState.decrementTime(delay);
+                    // Ensure producer is still true before consuming time slice
+                    if (!sharedState.getState()) {
+                        System.out.println("Consumer: Paused (Producer state is false)");
+                        break;
+                    }
                     
-                    // Sleep for M/10 milliseconds, checking state periodically
-                    long startTime = System.currentTimeMillis();
-                    while (System.currentTimeMillis() - startTime < delay && 
-                           !sharedState.shouldStop() && sharedState.getState()) {
-                        Thread.sleep(10);  // Check every 10ms
+                    // Decrement by delay amount and wait with delay M/10
+                    sharedState.decrementTime(delay);
+                    Thread.sleep(delay);
+                    // State became false, pause
+                    if (!sharedState.getState() && !sharedState.shouldStop()) {
+                        System.out.println("Consumer: Paused (Producer state is false)");
                     }
                 }
-                
-                // State became false, pause
-                if (!sharedState.getState() && !sharedState.shouldStop()) {
-                    System.out.println("Consumer: Paused (Producer state is false)");
-                }
-                
             } catch (InterruptedException e) {
                 System.out.println("Consumer interrupted");
                 break;
